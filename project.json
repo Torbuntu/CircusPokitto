@@ -306,6 +306,9 @@
 		},
 		"/CircusPokitto.bin.1.gif": {
 			"sdcard": false
+		},
+		"/README.md": {
+			"sdcard": false
 		}
 	},
 	"BUILDFlags": {
