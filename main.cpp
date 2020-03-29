@@ -29,7 +29,7 @@ int main(){
     Display::loadRGBPalette(miloslav);
 
 
-    int x=32, y=132, vy=-3, speed=3;
+    int x=32, y=132, vy=-3, vx = 0, speed=3;
     int x2 = 64, y2 = 132, c2=0;
     int barX = 38, barY = 132;
     bool barMirror = false;
@@ -72,9 +72,8 @@ int main(){
         if( !Core::update() ) 
             continue;
 
-        if(Buttons::leftBtn()) barX -= speed;
-        else if(Buttons::rightBtn()) barX += speed;
-        
+        if(Buttons::leftBtn() && barX > 8) barX -= speed;
+        else if(Buttons::rightBtn() && barX + 40 < Display::width) barX += speed;
         
         // Update balloon movement and player collision and draw
         for(int i = 0; i < rowSize; ++i){
@@ -88,28 +87,37 @@ int main(){
             rowC[i].x--;
             if(rowC[i].x < -8)rowC[i].x = Display::width;
             
-            if(y < 17 && !rowA[i].pop){
-               if (collides(x, y, rowA[i])){
-                    rowA[i].pop = true;
-                    score += 5;
-                    vy = 2;
-               }
+            if(y < 17 && !rowA[i].pop && collides(x, y, rowA[i])){
+                if(x < rowA[i].x+4){
+                    vx = -1;
+                }else {
+                    vx = 1;
+                }
+                rowA[i].pop = true;
+                score += 5;
+                vy = 2;
             }
             
-            if(y < 27 && !rowB[i].pop){
-                if(collides(x, y, rowB[i])){
-                    rowB[i].pop = true;
-                    score += 5;
-                    vy = 2;
+            if(y < 27 && !rowB[i].pop && collides(x, y, rowB[i])){
+                if(x < rowB[i].x+4){
+                    vx = -1;
+                }else {
+                    vx = 1;
                 }
+                rowB[i].pop = true;
+                score += 5;
+                vy = 2;
             }
             
-            if(y < 37 && !rowC[i].pop){
-                if(collides(x, y, rowC[i])){
-                    rowC[i].pop = true;
-                    score += 5;
-                    vy = 2;
+            if(y < 37 && !rowC[i].pop && collides(x, y, rowC[i])){
+                if(x < rowC[i].x+4){
+                    vx = -1;
+                }else {
+                    vx = 1;
                 }
+                rowC[i].pop = true;
+                score += 5;
+                vy = 2;
             }
             
             if(!rowA[i].pop) Display::drawSprite(rowA[i].x, rowA[i].y, Balloon, false, false, rowA[i].color);
@@ -123,11 +131,25 @@ int main(){
         
         // Update player position
         if(y < 4) vy = 2;
-        
+        if(x < 1 ) {
+            x = 0;
+            vx = -vx;
+        }
+        if(x+17 > Display::width){
+            x=Display::width;
+            vx = -vx;
+        }
+        // Player is bellow bar height
         if(y >= barY-16) {
+            // Player is within bar x
             if(x+8 > barX && x < barX + 26){
                 barMirror = !barMirror;
                 vy = -3;
+                x = x2;
+                
+                if(vx != 0){
+                    vx = -vx;
+                }
             }
             if(y > barY){
                 //newGame
@@ -138,7 +160,7 @@ int main(){
         else x2 = barX-6;
         
         y += vy;
-        
+        x += vx;
         
         
         //Draw player and bar
