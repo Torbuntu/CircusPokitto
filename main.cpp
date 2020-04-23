@@ -147,9 +147,7 @@ int main(){
                 vy = -3;
                 x = x2;
                 
-                if(vx != 0){
-                    vx = -vx;
-                }
+            
             }
             if(y > barY){
                 //newGame
